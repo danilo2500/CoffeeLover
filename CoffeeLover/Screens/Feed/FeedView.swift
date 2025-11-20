@@ -37,6 +37,7 @@ struct FeedView: View {
                 }
                 if let imageURL = viewModel.coffeeImageURL {
                     FramedPortraitView(imageURL: imageURL)
+                        .accessibilityIdentifier("coffeeCard")
                         .offset(offset)
                         .gesture(
                             DragGesture()

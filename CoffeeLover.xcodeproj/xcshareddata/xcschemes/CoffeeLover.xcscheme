@@ -41,6 +41,17 @@
                ReferencedContainer = "container:CoffeeLover.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "30FEAU052ECF3A000013367B"
+               BuildableName = "CoffeeLoverUITests.xctest"
+               BlueprintName = "CoffeeLoverUITests"
+               ReferencedContainer = "container:CoffeeLover.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

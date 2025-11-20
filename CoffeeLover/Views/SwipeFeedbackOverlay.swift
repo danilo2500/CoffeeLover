@@ -26,6 +26,7 @@ struct SwipeFeedbackOverlay: View {
             .rotationEffect(.degrees(reachThreshold ? 20 : .zero))
             .transition(.asymmetric(insertion: .identity, removal: .scale))
             .animation(.default, value: textVisibility)
+            .accessibilityIdentifier(like ? "swipeFeedbackLike" : "swipeFeedbackDislike")
     }
 }
 

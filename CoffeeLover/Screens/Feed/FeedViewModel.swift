@@ -17,12 +17,16 @@ import SwiftData
     var nextCoffeeImageURL: URL?
     var showError: Bool = false
     
-    private let restService = RESTService<CoffeeAPI>()
+    private let coffeeService: CoffeeServiceProtocol
+    
+    init(coffeeService: CoffeeServiceProtocol = CoffeeService()) {
+        self.coffeeService = coffeeService
+    }
     
     func fetchRandomCoffee() {
         Task {
             do {
-                let response: CoffeeResponse = try await restService.request(.getRandom)
+                let response = try await coffeeService.fetchRandomCoffee()
                 coffeeImageURL = response.file
                 fetchNextCoffee()
             } catch {
@@ -34,7 +38,7 @@ import SwiftData
     func fetchNextCoffee() {
         Task {
             do {
-                let response: CoffeeResponse = try await restService.request(.getRandom)
+                let response = try await coffeeService.fetchRandomCoffee()
                 nextCoffeeImageURL = response.file
             } catch {
                 showError = true

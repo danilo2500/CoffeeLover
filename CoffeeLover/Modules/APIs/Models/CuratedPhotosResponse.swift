@@ -1,5 +1,5 @@
 //
-//  PhotosResponse.swift
+//  CoffeeResponse.swift
 //  Canvas
 //
 //  Created by Danilo Henrique on 06/02/25.

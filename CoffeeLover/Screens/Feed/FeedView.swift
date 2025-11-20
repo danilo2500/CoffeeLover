@@ -90,6 +90,7 @@ struct FeedView: View {
             Button("Retry") {
                 viewModel.fetchRandomCoffee()
             }
+            Button("Cancel", role: .cancel) {}
         }
         .fontDesign(.serif)
         .foregroundStyle(.white)

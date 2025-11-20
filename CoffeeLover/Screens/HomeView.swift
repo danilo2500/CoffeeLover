@@ -80,6 +80,7 @@ struct FeedView: View {
             Divider()
             Text("Swipe left to dislike, right to like!")
         }
+        .padding()
         .overlay {
             SwipeFeedbackOverlay(textVisibility: swipeIntensity, reachThreshold: reachThresshold)
         }
@@ -89,6 +90,7 @@ struct FeedView: View {
             }
         }
         .fontDesign(.serif)
+        .foregroundStyle(.white)
         .background {
             BackgroundView()
         }

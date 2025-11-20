@@ -26,29 +26,27 @@ struct FavoritesView: View {
                 } else {
                     ScrollView {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 30) {
-                            ForEach(favorites, id: \.self) { favorite in
+                            ForEach(favorites) { favorite in
                                 FramedPortraitView(imageURL: favorite.imageURL)
-                                    .overlay(alignment: .topLeading) {
-                                        if isEditing {
-                                            Image(systemName: "minus.circle.fill")
-                                                .font(.largeTitle)
-                                                .foregroundStyle(.red)
-                                        }
-                                    }
                                     .contextMenu {
                                         Button("Remove from Favorites", systemImage: "heart.slash", role: .destructive) {
                                             modelContext.delete(favorite)
                                         }
                                     }
-                                    .onTapGesture {
-//                                        if isEditing {
-                                            withAnimation {
-                                                modelContext.delete(favorite)
-                                                print(favorite.imageURL)
-                                            }
-//                                        }
-                                    }
                                     .transition(.scale)
+                                    .overlay(alignment: .topLeading){
+                                        if isEditing {
+                                            Button(role: .destructive) {
+                                                modelContext.delete(favorite)
+                                            } label: {
+                                                Image(systemName: "minus.circle.fill")
+                                                    .resizable()
+                                                    .frame(width: 33, height: 33)
+                                                    .foregroundStyle(.red)
+                                            }
+                                            .padding(8)
+                                        }
+                                    }
                             }
                         }
                         .padding()
@@ -59,8 +57,10 @@ struct FavoritesView: View {
                 Button(isEditing ? "Confirm" : "Edit") {
                     isEditing.toggle()
                 }
+                .foregroundStyle(.black)
             }
             .fontDesign(.serif)
+            .foregroundStyle(.white)
             .navigationTitle("Favorites")
             .background {
                 BackgroundView()
@@ -77,6 +77,7 @@ struct FavoritesView: View {
         "https://coffee.alexflipnote.dev/4pdGG7SkPIQ_coffee.jpg",
         "https://coffee.alexflipnote.dev/fD_8_EAZBSo_coffee.jpg",
         "https://coffee.alexflipnote.dev/random",
+        "https://coffee.alexflipnote.dev/uBN3RXLY2HA_coffee.jpg"
     ]
     
     for urlString in sampleURLs {

@@ -9,10 +9,19 @@ import SwiftUI
 
 struct FeedView: View {
     var body: some View {
-        Text("Discorver")
-            .background {
-                BackgroundView()
-            }
+        VStack {
+            Text("Find your favorite")
+            Spacer()
+            Rectangle()
+                .aspectRatio(contentMode: .fit)
+                .padding()
+            Spacer()
+                .onDrag(<#T##data: () -> NSItemProvider##() -> NSItemProvider#>)
+                
+        }
+        .background {
+            BackgroundView()
+        }
     }
 }
 

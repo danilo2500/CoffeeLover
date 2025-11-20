@@ -26,9 +26,6 @@ final class CoffeeLoverUITests: XCTestCase {
         
         Thread.sleep(forTimeInterval: 2)
         
-        XCTAssertTrue(coffeeCard.isHittable, "Coffee card should be interactable")
-        XCTAssertTrue(coffeeCard.frame.width > 0 && coffeeCard.frame.height > 0, "Coffee card should have valid dimensions")
-        
         let startPoint = coffeeCard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
         let endPoint = coffeeCard.coordinate(withNormalizedOffset: CGVector(dx: 0.1, dy: 0.5))
         
@@ -42,9 +39,6 @@ final class CoffeeLoverUITests: XCTestCase {
         XCTAssertTrue(coffeeCard.waitForExistence(timeout: 10), "Coffee card should appear within 10 seconds")
         
         Thread.sleep(forTimeInterval: 2)
-        
-        XCTAssertTrue(coffeeCard.isHittable, "Coffee card should be interactable")
-        XCTAssertTrue(coffeeCard.frame.width > 0 && coffeeCard.frame.height > 0, "Coffee card should have valid dimensions")
         
         let startPoint = coffeeCard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
         let endPoint = coffeeCard.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5))

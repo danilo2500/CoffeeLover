@@ -29,54 +29,63 @@ struct FeedView: View {
                 .font(.largeTitle.bold())
             Spacer()
             
-            if let imageURL = viewModel.coffeeImageURL {
-                FramedPortraitView(imageURL: imageURL)
-                    .offset(offset)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { gesture in
-                                offset = gesture.translation
-                                angle = gesture.translation.width / 15
-                                textVisibility = gesture.translation.width / 200
-                                withAnimation(.bouncy) {
-                                    reachThresshold = abs(textVisibility) > 1
-                                }
-                            }
-                            .onEnded { gesture in
-                                if reachThresshold {
-                                    let liked = textVisibility > 0
-                                    offset = CGSize(width: 500 * textVisibility, height: gesture.translation.height)
-                                    
-                                    Task { @MainActor in
-                                        try await Task.sleep(for: .seconds(1))
-                                        resetAnimationState()
+            ZStack {
+                if let nextImageURL = viewModel.nextCoffeeImageURL {
+                    FramedPortraitView(imageURL: nextImageURL)
+                        .scaleEffect(min(1, abs(textVisibility)))
+                        .opacity(abs(textVisibility))
+                }
+                
+                if let imageURL = viewModel.coffeeImageURL {
+                    FramedPortraitView(imageURL: imageURL)
+                        .offset(offset)
+                        .gesture(
+                            DragGesture()
+                                .onChanged { gesture in
+                                    offset = gesture.translation
+                                    angle = gesture.translation.width / 15
+                                    textVisibility = gesture.translation.width / 200
+                                    print(textVisibility)
+                                    withAnimation(.bouncy) {
+                                        reachThresshold = abs(textVisibility) > 1
                                     }
-                                    
-                                    viewModel.handleSwipe(liked: liked, modelContext: modelContext)
-                                } else {
-                                    resetAnimationState()
                                 }
-                            }
-                    )
-                    .rotationEffect(.init(degrees: angle))
-                    .animation(.spring, value: offset)
-                    .animation(.spring, value: angle)
-                    .transition(.blurReplace)
-                    .padding()
-            } else {
-                ProgressView()
-                    .controlSize(.extraLarge)
+                                .onEnded { gesture in
+                                    if reachThresshold {
+                                        let liked = textVisibility > 0
+                                        withAnimation {
+                                            offset = CGSize(width: 500 * textVisibility, height: gesture.translation.height)
+                                        }
+                                        Task { @MainActor in
+                                            try await Task.sleep(for: .seconds(1.5))
+                                            resetAnimationState()
+                                        }
+                                        viewModel.handleSwipe(liked: liked, modelContext: modelContext)
+                                    } else {
+                                        withAnimation(.bouncy) {
+                                            resetAnimationState()
+                                        }
+                                    }
+                                }
+                        )
+                        .rotationEffect(.init(degrees: angle))
+                        
+                } else {
+                    ProgressView()
+                        .controlSize(.extraLarge)
+                }
             }
+            .padding()
             
             Spacer()
             
             Divider()
             Text("Swipe left to dislike, right to like!")
         }
-        .animation(.bouncy, value: viewModel.coffeeImageURL)
         .overlay {
             SwipeFeedbackOverlay(textVisibility: textVisibility, reachThreshold: reachThresshold)
         }
+        
         .fontDesign(.serif)
         .background {
             BackgroundView()

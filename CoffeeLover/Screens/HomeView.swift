@@ -14,13 +14,13 @@ struct FeedView: View {
     
     @State var offset = CGSize.zero
     @State var angle = Double.zero
-    @State var textVisibility = Double.zero
+    @State var swipeIntensity = Double.zero
     @State var reachThresshold = false
     
     private func resetAnimationState() {
         offset = .zero
         angle = .zero
-        textVisibility = .zero
+        swipeIntensity = .zero
     }
     
     var body: some View {
@@ -32,10 +32,9 @@ struct FeedView: View {
             ZStack {
                 if let nextImageURL = viewModel.nextCoffeeImageURL {
                     FramedPortraitView(imageURL: nextImageURL)
-                        .scaleEffect(min(1, abs(textVisibility)))
-                        .opacity(abs(textVisibility))
+                        .scaleEffect(min(1, abs(swipeIntensity)))
+                        .opacity(abs(swipeIntensity))
                 }
-                
                 if let imageURL = viewModel.coffeeImageURL {
                     FramedPortraitView(imageURL: imageURL)
                         .offset(offset)
@@ -44,23 +43,22 @@ struct FeedView: View {
                                 .onChanged { gesture in
                                     offset = gesture.translation
                                     angle = gesture.translation.width / 15
-                                    textVisibility = gesture.translation.width / 200
-                                    print(textVisibility)
+                                    swipeIntensity = gesture.translation.width / 200
                                     withAnimation(.bouncy) {
-                                        reachThresshold = abs(textVisibility) > 1
+                                        reachThresshold = abs(swipeIntensity) > 1
                                     }
                                 }
                                 .onEnded { gesture in
                                     if reachThresshold {
-                                        let liked = textVisibility > 0
+                                        let liked = swipeIntensity > 0
                                         withAnimation {
-                                            offset = CGSize(width: 500 * textVisibility, height: gesture.translation.height)
+                                            offset = CGSize(width: 500 * swipeIntensity, height: gesture.translation.height)
                                         }
                                         Task { @MainActor in
                                             try await Task.sleep(for: .seconds(1.5))
+                                            viewModel.handleSwipe(liked: liked, modelContext: modelContext)
                                             resetAnimationState()
                                         }
-                                        viewModel.handleSwipe(liked: liked, modelContext: modelContext)
                                     } else {
                                         withAnimation(.bouncy) {
                                             resetAnimationState()
@@ -83,7 +81,7 @@ struct FeedView: View {
             Text("Swipe left to dislike, right to like!")
         }
         .overlay {
-            SwipeFeedbackOverlay(textVisibility: textVisibility, reachThreshold: reachThresshold)
+            SwipeFeedbackOverlay(textVisibility: swipeIntensity, reachThreshold: reachThresshold)
         }
         
         .fontDesign(.serif)

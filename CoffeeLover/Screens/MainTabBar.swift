@@ -18,7 +18,7 @@ struct MainTabBar: View {
                 }
             }
             Tab("Favorites", systemImage: "heart") {
-                EmptyView()
+                FavoritesView()
             }
         }
         .tint(.palleteSecondary)

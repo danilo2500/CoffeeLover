@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct FeedView: View {
     @StateObject var viewModel = FeedViewModel()
+    @Environment(\.modelContext) private var modelContext
     
     @State var offset = CGSize.zero
     @State var angle = Double.zero
@@ -22,12 +24,13 @@ struct FeedView: View {
             Spacer()
             
             if let imageURL = viewModel.coffeeImageURL {
-                Color.black
-                    .overlay {
-                        CoffeeImageView(imageURL: imageURL)
+                Image("frame")
+                    .resizable()
+                    .background {
+                        AsyncFetchImageView(imageURL: imageURL)
                     }
+                    .background(.ultraThinMaterial)
                     .aspectRatio(contentMode: .fit)
-                    .border(.brown.mix(with: .black, by: 0.7), width: 20)
                     .clipShape(.rect(cornerRadius: 20))
                     .shadow(radius: 20)
                     .offset(offset)
@@ -43,7 +46,18 @@ struct FeedView: View {
                             }
                             .onEnded { gesture in
                                 if reachThresshold {
-                                    
+                                    if let imageURL = viewModel.coffeeImageURL {
+                                        let favorite = FavoriteCoffee(imageURL: imageURL)
+                                        offset = CGSize(width: 600 * textVisibility, height: gesture.translation.height)
+                                        Task { @MainActor in
+                                            try await Task.sleep(for: .seconds(1))
+                                            offset = .zero
+                                            angle = .zero
+                                            textVisibility = .zero
+                                        }
+                                        modelContext.insert(favorite)
+                                    }
+                                    viewModel.moveToNext()
                                 } else {
                                     offset = .zero
                                     angle = .zero
@@ -54,6 +68,7 @@ struct FeedView: View {
                     .rotationEffect(.init(degrees: angle))
                     .animation(.spring, value: offset)
                     .animation(.spring, value: angle)
+                    .transition(.blurReplace)
                     .padding()
             } else {
                 ProgressView()
@@ -61,21 +76,26 @@ struct FeedView: View {
             }
             
             Spacer()
+            
+            Divider()
+            Text("Swipe left to dislike, right to like!")
         }
+        .animation(.bouncy, value: viewModel.coffeeImageURL)
         .overlay {
             let like = textVisibility > 0
             let color: Color = like ? .green : .red
             Text(like ? "Like" : "Dislike")
                 .font(.largeTitle.bold())
                 .padding()
-                .background(color, in: .capsule)
+                .background(color.gradient, in: .capsule)
                 .opacity(min(1, abs(textVisibility)))
-                .scaleEffect(min(1, abs(textVisibility)))
+                .scaleEffect(min(2, abs(textVisibility)))
                 .shadow(color:reachThresshold ? color : .clear, radius: 30)
                 .scaleEffect(reachThresshold ? 1.5 : 1)
                 .rotationEffect(.degrees(reachThresshold ? 20 : .zero))
                 
         }
+        .fontDesign(.serif)
         .background {
             BackgroundView()
         }
@@ -85,33 +105,12 @@ struct FeedView: View {
     }
 }
 
-import Combine
-
-struct CoffeeImageView: View {
-    let imageURL: URL
-    
-    var body: some View {
-        AsyncImage(url: imageURL) { phase in
-            switch phase {
-            case .empty:
-                ProgressView()
-                    .controlSize(.extraLarge)
-            case .success(let image):
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            case .failure:
-                Image(systemName: "photo.badge.exclamationmark.fill")
-            @unknown default:
-                EmptyView()
-            }
-        }
-    }
-}
-
 #Preview {
     FeedView()
 }
+
+import Combine
+import SwiftUI
 
 @Observable class FeedViewModel: ObservableObject {
     

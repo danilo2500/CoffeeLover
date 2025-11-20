@@ -17,6 +17,12 @@ struct FeedView: View {
     @State var textVisibility = Double.zero
     @State var reachThresshold = false
     
+    private func resetAnimationState() {
+        offset = .zero
+        angle = .zero
+        textVisibility = .zero
+    }
+    
     var body: some View {
         VStack {
             Text("Discover ☕")
@@ -24,15 +30,7 @@ struct FeedView: View {
             Spacer()
             
             if let imageURL = viewModel.coffeeImageURL {
-                Image("frame")
-                    .resizable()
-                    .background {
-                        AsyncFetchImageView(imageURL: imageURL)
-                    }
-                    .background(.ultraThinMaterial)
-                    .aspectRatio(contentMode: .fit)
-                    .clipShape(.rect(cornerRadius: 20))
-                    .shadow(radius: 20)
+                FramedPortraitView(imageURL: imageURL)
                     .offset(offset)
                     .gesture(
                         DragGesture()
@@ -47,20 +45,16 @@ struct FeedView: View {
                             .onEnded { gesture in
                                 if reachThresshold {
                                     let liked = textVisibility > 0
-                                    offset = CGSize(width: 600 * textVisibility, height: gesture.translation.height)
+                                    offset = CGSize(width: 500 * textVisibility, height: gesture.translation.height)
                                     
                                     Task { @MainActor in
                                         try await Task.sleep(for: .seconds(1))
-                                        offset = .zero
-                                        angle = .zero
-                                        textVisibility = .zero
+                                        resetAnimationState()
                                     }
                                     
                                     viewModel.handleSwipe(liked: liked, modelContext: modelContext)
                                 } else {
-                                    offset = .zero
-                                    angle = .zero
-                                    textVisibility = .zero
+                                    resetAnimationState()
                                 }
                             }
                     )
@@ -81,18 +75,7 @@ struct FeedView: View {
         }
         .animation(.bouncy, value: viewModel.coffeeImageURL)
         .overlay {
-            let like = textVisibility > 0
-            let color: Color = like ? .green : .red
-            Text(like ? "Like" : "Dislike")
-                .font(.largeTitle.bold())
-                .padding()
-                .background(color.gradient, in: .capsule)
-                .opacity(min(1, abs(textVisibility)))
-                .scaleEffect(min(2, abs(textVisibility)))
-                .shadow(color:reachThresshold ? color : .clear, radius: 30)
-                .scaleEffect(reachThresshold ? 1.5 : 1)
-                .rotationEffect(.degrees(reachThresshold ? 20 : .zero))
-                
+            SwipeFeedbackOverlay(textVisibility: textVisibility, reachThreshold: reachThresshold)
         }
         .fontDesign(.serif)
         .background {

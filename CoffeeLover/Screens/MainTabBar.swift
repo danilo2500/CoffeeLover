@@ -21,7 +21,6 @@ struct MainTabBar: View {
                 FavoritesView()
             }
         }
-        .tint(.palleteSecondary)
     }
 }
 #Preview {

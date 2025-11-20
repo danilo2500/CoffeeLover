@@ -83,7 +83,11 @@ struct FeedView: View {
         .overlay {
             SwipeFeedbackOverlay(textVisibility: swipeIntensity, reachThreshold: reachThresshold)
         }
-        
+        .alert("Error Loading Coffee", isPresented: $viewModel.showError) {
+            Button("Retry") {
+                viewModel.fetchRandomCoffee()
+            }
+        }
         .fontDesign(.serif)
         .background {
             BackgroundView()
@@ -106,32 +110,29 @@ import SwiftData
     
     var coffeeImageURL: URL?
     var nextCoffeeImageURL: URL?
+    var showError: Bool = false
     
     private let restService = RESTService<CoffeeAPI>()
     
     func fetchRandomCoffee() {
-        restService.request(.getRandom) { [weak self] (result: Result<CoffeeResponse, Error>) in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let response):
-                self.coffeeImageURL = response.file
-                self.fetchNextCoffee()
-            case .failure:
-                break
+        Task {
+            do {
+                let response: CoffeeResponse = try await restService.request(.getRandom)
+                coffeeImageURL = response.file
+                fetchNextCoffee()
+            } catch {
+                showError = true
             }
         }
     }
     
     func fetchNextCoffee() {
-        restService.request(.getRandom) { [weak self] (result: Result<CoffeeResponse, Error>) in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let response):
-                self.nextCoffeeImageURL = response.file
-            case .failure:
-                break
+        Task {
+            do {
+                let response: CoffeeResponse = try await restService.request(.getRandom)
+                nextCoffeeImageURL = response.file
+            } catch {
+                showError = true
             }
         }
     }

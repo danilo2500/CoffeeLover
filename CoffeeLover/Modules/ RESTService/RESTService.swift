@@ -10,29 +10,41 @@ import Foundation
 class RESTService<T: RESTRequest> {
     // MARK: - Public Functions
 
-    func request<U: Decodable>(_ request: T, completion: @escaping (Result<U, Error>) -> Void) {
-        let urlRequest: URLRequest
+//    func request<U: Decodable>(_ request: T, completion: @escaping (Result<U, Error>) -> Void) {
+//        let urlRequest: URLRequest
+//        do {
+//            urlRequest = try createURLRequest(with: request)
+//        } catch {
+//            completion(.failure(error))
+//            return
+//        }
+//
+//        URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+//            DispatchQueue.main.async {
+//                if let data = data {
+//                    do {
+//                        let object = try JSONDecoder().decode(U.self, from: data)
+//                        completion(.success(object))
+//                    } catch {
+//                        completion(.failure(error))
+//                    }
+//                } else {
+//                    completion(.failure(error ?? RESTError.failedToGenerateData))
+//                }
+//            }
+//        }.resume()
+//    }
+    
+    @discardableResult
+    func request<U: Decodable>(_ request: T) async throws -> U {
+        let urlRequest = try createURLRequest(with: request)
         do {
-            urlRequest = try createURLRequest(with: request)
+            let (data, response) = try await URLSession.shared.data(for: urlRequest)
+            print(response)
+            return try decodeResponse(data: data)
         } catch {
-            completion(.failure(error))
-            return
+            throw error
         }
-
-        URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            DispatchQueue.main.async {
-                if let data = data {
-                    do {
-                        let object = try JSONDecoder().decode(U.self, from: data)
-                        completion(.success(object))
-                    } catch {
-                        completion(.failure(error))
-                    }
-                } else {
-                    completion(.failure(error ?? RESTError.failedToGenerateData))
-                }
-            }
-        }.resume()
     }
 
     // MARK: - Private Functions
@@ -59,6 +71,14 @@ class RESTService<T: RESTRequest> {
             return url
         } else {
             throw RESTError.failedToCreateURL
+        }
+    }
+    private func decodeResponse<U: Decodable>(data: Data) throws -> U {
+        do {
+            let object = try JSONDecoder().decode(U.self, from: data)
+            return object
+        } catch {
+            throw error
         }
     }
 }

@@ -21,7 +21,7 @@ struct MainTabBar: View {
                 FavoritesView()
             }
         }
-        .foregroundStyle(.black)
+        .tint(.white)
     }
 }
 #Preview {

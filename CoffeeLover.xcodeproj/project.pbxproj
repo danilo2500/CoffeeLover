@@ -6,8 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		30FEAEA72ECF2BE00013367B /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 302AA65A2ECE98E40069376A /* Kingfisher */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
-		302AA64B2ECE98E20069376A /* CoffeeLover.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = CoffeeLover.app; path = /Users/danilohenrique/Desktop/CoffeeLover/build/Debug/CoffeeLover.app; sourceTree = "<absolute>"; };
+		30FEAEA82ECF2BE00013367B /* CoffeeLover.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CoffeeLover.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30FEAEA72ECF2BE00013367B /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -33,6 +38,7 @@
 			isa = PBXGroup;
 			children = (
 				302AA64D2ECE98E20069376A /* CoffeeLover */,
+				30FEAEA82ECF2BE00013367B /* CoffeeLover.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -59,7 +65,7 @@
 				302AA65A2ECE98E40069376A /* Kingfisher */,
 			);
 			productName = CoffeeLover;
-			productReference = 302AA64B2ECE98E20069376A /* CoffeeLover.app */;
+			productReference = 30FEAEA82ECF2BE00013367B /* CoffeeLover.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

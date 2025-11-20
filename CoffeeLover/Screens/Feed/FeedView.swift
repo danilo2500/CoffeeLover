@@ -83,6 +83,7 @@ struct FeedView: View {
         .padding()
         .overlay {
             SwipeFeedbackOverlay(textVisibility: swipeIntensity, reachThreshold: reachThresshold)
+                .sensoryFeedback(.levelChange, trigger: reachThresshold)
         }
         .alert("Error Loading Coffee", isPresented: $viewModel.showError) {
             Button("Retry") {

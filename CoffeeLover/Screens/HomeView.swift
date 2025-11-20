@@ -46,18 +46,17 @@ struct FeedView: View {
                             }
                             .onEnded { gesture in
                                 if reachThresshold {
-                                    if let imageURL = viewModel.coffeeImageURL {
-                                        let favorite = FavoriteCoffee(imageURL: imageURL)
-                                        offset = CGSize(width: 600 * textVisibility, height: gesture.translation.height)
-                                        Task { @MainActor in
-                                            try await Task.sleep(for: .seconds(1))
-                                            offset = .zero
-                                            angle = .zero
-                                            textVisibility = .zero
-                                        }
-                                        modelContext.insert(favorite)
+                                    let liked = textVisibility > 0
+                                    offset = CGSize(width: 600 * textVisibility, height: gesture.translation.height)
+                                    
+                                    Task { @MainActor in
+                                        try await Task.sleep(for: .seconds(1))
+                                        offset = .zero
+                                        angle = .zero
+                                        textVisibility = .zero
                                     }
-                                    viewModel.moveToNext()
+                                    
+                                    viewModel.handleSwipe(liked: liked, modelContext: modelContext)
                                 } else {
                                     offset = .zero
                                     angle = .zero
@@ -111,6 +110,7 @@ struct FeedView: View {
 
 import Combine
 import SwiftUI
+import SwiftData
 
 @Observable class FeedViewModel: ObservableObject {
     
@@ -146,7 +146,15 @@ import SwiftUI
         }
     }
     
-    func moveToNext() {
+    func handleSwipe(liked: Bool, modelContext: ModelContext) {
+        if liked, let imageURL = coffeeImageURL {
+            let favorite = FavoriteCoffee(imageURL: imageURL)
+            modelContext.insert(favorite)
+        }
+        moveToNext()
+    }
+    
+    private func moveToNext() {
         coffeeImageURL = nextCoffeeImageURL
         nextCoffeeImageURL = nil
         fetchNextCoffee()

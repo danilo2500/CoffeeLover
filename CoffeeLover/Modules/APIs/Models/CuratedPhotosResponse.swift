@@ -8,5 +8,5 @@
 import Foundation
 
 struct CoffeeResponse: Codable {
-    let file: String
+    let file: URL
 }
